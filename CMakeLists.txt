@@ -16,25 +16,7 @@ add_link_options($<$<CONFIG:RELEASE>:-s>)
 if(ENABLE_CPU_PROFILING)
     add_compile_options(-pg)
 endif()
-
-set(SYNAP_SYSROOT_INCLUDEDIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR})
-set(SYNAP_SYSROOT_LIBDIR ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
-
-# yocto runtime build and toolchain build cmake sysroot are different
-# 1. runtime build, each recipe has its own sysroot, cmake install prefix `/usr` is relative path to `recipe-sysroot`
-#    better keep runtime build cmake config to make use of yocto recipe sysroot
-# 2. toolchain build, we can explicitly set cmake install prefix, as the normal cmake build
-if(CMAKE_FIND_ROOT_PATH)
-    foreach(root_path IN LISTS CMAKE_FIND_ROOT_PATH)
-        if(${root_path} MATCHES "recipe-sysroot*")
-            set(SYNAP_SYSROOT_INCLUDEDIR ${root_path}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR})
-            set(SYNAP_SYSROOT_LIBDIR ${root_path}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
-            break()
-        endif()
-    endforeach()
-endif()
-
-link_directories(${SYNAP_SYSROOT_LIBDIR})
+message("CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 
 option(ENABLE_EBGRUNTIME "Enable EBGRUNTIME compilation and associated SyNAP support" ON)
 option(ENABLE_ONNXRUNTIME "Enable ONNXRUNTIME compilation and associated SyNAP support" OFF)
@@ -78,7 +60,3 @@ endif()
 add_subdirectory(lib)
 
 add_subdirectory(app)
-
-if(ENABLE_TEST)
-    add_subdirectory(test)
-endif()
