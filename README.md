@@ -25,7 +25,7 @@ alias toolchain='source /opt/poky/4.0.17/environment-setup-cortexa73-poky-linux'
 > [!TIP]
 > To check if the cross-compilation environment is active, use the following command in your Ubuntu terminal:
 > ```
-> $CC
+> echo $CC
 > ```
 
 ### Build Process
