@@ -27,6 +27,9 @@ alias toolchain='source /opt/poky/4.0.17/environment-setup-cortexa73-poky-linux'
 > ```
 > echo $CC
 > ```
+> You should see an output similar to:
+> ```
+> aarch64-poky-linux-gcc -mcpu=cortex-a73 -march=armv8-a+crc -mbranch-protection=standard -fstack-protector-strong -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/opt/poky/4.0.17/sysroots/cortexa73-poky-linux
 
 ### Build Process
 #### **Step 1: Clone the repository**
@@ -65,5 +68,5 @@ This shared library object is generated at `build/lib/synapnb/libsynapnb.so`.
 Each compiled application binary will be placed in its respective folder at `build/app/<app name>/`.
 <br>To deploy an application, copy the generated binary to the system binary directory `/usr/bin/` on your board.
 
-> [!IMPORTANT]
+> [!WARNING]
 > It is highly recommended to make backups before replacing library files and/or binaries in `/usr/lib/` and `/usr/bin/`
