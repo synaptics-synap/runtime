@@ -1,0 +1,7 @@
+__pycache__/
+[Bb]uild/
+*.py[cod]
+_build
+.pytest_cache
+.vscode
+CMakeLists.txt.user
