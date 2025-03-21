@@ -1,0 +1,44 @@
+# SPDX-License-Identifier: GPL-2.0
+# Copyright (C) 2021 Synaptics Incorporated
+
+MODULE_NAME ?= synap
+
+EXTRA_CFLAGS += -Werror
+
+EXTRA_CFLAGS += -DDEVICE_NAME=\"synap\"
+
+EXTRA_CFLAGS += -I$(src)/src \
+                -I$(src)/inc
+
+EXTRA_CFLAGS += -I$(src)/../lib/ta_interface -I$(src)/../lib/ebg_file
+
+TEE_INC_PATH += -I$(srctree)/drivers/soc/berlin/modules/tzd/tee/client_api \
+                -I$(srctree)/drivers/soc/berlin/modules/tzd/tee/common \
+                -I$(srctree)/drivers/soc/berlin/modules/tzd/tz/common \
+                -I$(srctree)/drivers/soc/berlin/modules/tzd/include \
+                -I$(srctree)/drivers/soc/berlin/modules/tzd
+
+ION_INC_PATH += -I$(srctree)/drivers/staging/android/ion
+
+EXTRA_CFLAGS += $(TEE_INC_PATH) $(ION_INC_PATH)
+
+OBJS := src/synap_kernel.o \
+        src/synap_kernel_drv.o \
+        src/synap_kernel_stats.o \
+        src/synap_mem.o \
+        src/synap_profile.o \
+        ../lib/ebg_file/ebg_file.o
+
+ifeq ($(CONFIG_OPTEE), y)
+    OBJS += src/synap_kernel_ca_optee.o
+else
+    OBJS += src/synap_kernel_ca_tzk.o
+endif
+
+ifeq ($(DEBUG), 1)
+    EXTRA_CFLAGS += -DDEBUG_LEVEL=2
+endif
+
+obj-m += $(MODULE_NAME).o
+
+$(MODULE_NAME)-objs  = $(OBJS)
