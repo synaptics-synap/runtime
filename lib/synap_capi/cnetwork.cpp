@@ -86,6 +86,37 @@ bool network_predict(
     return true;
 }
 
+size_t network_get_input_size(CNetwork* network, size_t index) {
+    if (!network || !network->impl) {
+        LOGE << "Invalid network";
+        return 0;
+    }
+    Network* net = network->impl;
+
+    if (index >= net->inputs.size()) {
+        LOGE << "Input index out of range: " << index << ", size: " << net->inputs.size();
+        return 0;
+    }
+
+    return net->inputs[index].size();
+}
+
+size_t network_get_input_count(CNetwork* network) {
+    if (!network || !network->impl) {
+        LOGE << "Invalid network";
+        return 0;
+    }
+    return network->impl->inputs.size();
+}
+
+size_t network_get_output_count(CNetwork* network) {
+    if (!network || !network->impl) {
+        LOGE << "Invalid network";
+        return 0;
+    }
+    return network->impl->outputs.size();
+}
+
 #ifdef __cplusplus
 }
 #endif
