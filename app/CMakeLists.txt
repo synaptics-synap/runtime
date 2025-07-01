@@ -14,6 +14,7 @@ if(CMAKE_CROSSCOMPILING OR ENABLE_SYNAP_DEVICE_SIMULATOR)
 
     add_subdirectory(synap_cli)
     add_subdirectory(synap_cli_ic)
+    add_subdirectory(synap_cli_capi)
     if(ENABLE_EBGRUNTIME)
         # FIXME: relies on Buffer ctor specific to synap_device
         add_subdirectory(synap_cli_ic2)
