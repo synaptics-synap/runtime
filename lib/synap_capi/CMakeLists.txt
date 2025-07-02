@@ -3,8 +3,8 @@
 
 set(name synap_capi)
 
-set(SOURCES cnetwork.cpp)
-set(HEADERS cnetwork.h)
+set(SOURCES synap_cnetwork.cpp)
+set(HEADERS synap_cnetwork.h)
 
 add_library(${name} STATIC ${SOURCES})
 target_link_libraries(${name} PRIVATE synapnb)

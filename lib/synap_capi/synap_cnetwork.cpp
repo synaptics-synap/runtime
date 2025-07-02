@@ -4,7 +4,7 @@
 /// Synap C API for Network.
 ///
 
-#include "cnetwork.h"
+#include "synap_cnetwork.h"
 #include "synap/network.hpp"
 #include "synap/logging.hpp"
 

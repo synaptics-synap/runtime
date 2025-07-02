@@ -1,6 +1,6 @@
 #define _POSIX_C_SOURCE 199309L
 
-#include "cnetwork.h"
+#include "synap_cnetwork.h"
 
 #include <stdio.h>
 #include <stdlib.h>
