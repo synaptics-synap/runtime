@@ -47,12 +47,20 @@ void cleanup(CNetwork* network,
 
 int main(int argc, char** argv) {
     if (argc < 3) {
-        printf("Usage: %s <model_file: .synap> <input_mode: zero | random | value:n>\n", argv[0]);
+        printf("Usage: %s <model_file: .synap> <input_mode: zero | random | value:n> [<repeat:n>]\n", argv[0]);
         return 1;
     }
 
     const char* model_path = argv[1];
     const char* input_mode = argv[2];
+    int repeat = 1;
+    if (argc > 3) {
+        repeat = atoi(argv[3]);
+        if (repeat < 1) {
+            fprintf(stderr, "Invalid repeat count: %s\n", argv[3]);
+            return 1;
+        }
+    }
     srand((unsigned int)time(NULL));
     struct timespec start, end;
     long infer_times[3] = {};
@@ -71,7 +79,7 @@ int main(int argc, char** argv) {
     }
     clock_gettime(CLOCK_MONOTONIC, &end);
     infer_times[0] = end.tv_nsec - start.tv_nsec;
-    printf("Loaded model: %s\n", model_path);
+    printf("Loaded network: %s\n\n", model_path);
     size_t n_inputs = network_get_input_count(network);
     size_t n_outputs = network_get_output_count(network);
 
@@ -85,7 +93,7 @@ int main(int argc, char** argv) {
     }
 
     clock_gettime(CLOCK_MONOTONIC, &start);
-    for (int i = 0; i < n_inputs; i++) {
+    for (size_t i = 0; i < n_inputs; i++) {
         size_t input_size = network_get_input_size(network, i);
         uint8_t* input_data = malloc(input_size);
         if (!input_data) {
@@ -102,18 +110,21 @@ int main(int argc, char** argv) {
     clock_gettime(CLOCK_MONOTONIC, &end);
     infer_times[1] = end.tv_nsec - start.tv_nsec;
 
-    clock_gettime(CLOCK_MONOTONIC, &start);
-    if (!network_predict(network, inputs, n_inputs, outputs, n_outputs)) {
-        fprintf(stderr, "Inference failed\n");
-        cleanup(network, input_buffers, n_inputs, inputs, outputs);
-        return 1;
+    for (size_t i = 0; i < repeat; i++) {
+        clock_gettime(CLOCK_MONOTONIC, &start);
+        if (!network_predict(network, inputs, n_inputs, outputs, n_outputs)) {
+            fprintf(stderr, "Inference failed\n");
+            cleanup(network, input_buffers, n_inputs, inputs, outputs);
+            return 1;
+        }
+        clock_gettime(CLOCK_MONOTONIC, &end);
+        double infer_time = end.tv_nsec - start.tv_nsec;
+        printf("Predict #%lu: %.2lf\n", i, infer_time / 1e6);
+        infer_times[2] += infer_time;
     }
-    clock_gettime(CLOCK_MONOTONIC, &end);
-    infer_times[2] = end.tv_nsec - start.tv_nsec;
 
-    printf("Output size: %zu floats\n", outputs[0].size / sizeof(float));
-    printf("Inference times (ms): load: %lf, init: %lf, predict: %lf\n",
-           infer_times[0] / 1e6, infer_times[1] / 1e6, infer_times[2] / 1e6);
+    printf("\nInference times (ms): load: %.2lf, init: %.2lf, predict: %.2lf\n",
+           infer_times[0] / 1e6, infer_times[1] / 1e6, infer_times[2] / repeat / 1e6);
 
     cleanup(network, input_buffers, n_inputs, inputs, outputs);
 
