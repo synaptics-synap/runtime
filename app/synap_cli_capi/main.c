@@ -45,19 +45,55 @@ void cleanup(CNetwork* network,
     free(outputs);
 }
 
+bool binary_file_write(const char *file_name, const void *data, size_t size) {
+    FILE *fp = fopen(file_name, "wb");
+    if (!fp) {
+        fprintf(stderr, "Can't open file for writing: %s\n", file_name);
+        return false;
+    }
+
+    if (data && size > 0) {
+        size_t written = fwrite(data, 1, size, fp);
+        if (written != size) {
+            fprintf(stderr,
+                    "Write error (wrote %zu of %zu bytes) to %s\n",
+                    written, size, file_name);
+            fclose(fp);
+            return false;
+        }
+    }
+
+    if (fclose(fp) != 0) {
+        fprintf(stderr, "Can't close file: %s\n", file_name);
+        return false;
+    }
+
+    return true;
+}
+
 int main(int argc, char** argv) {
-    if (argc < 3) {
-        printf("Usage: %s <model_file: .synap> <input_mode: zero | random | value:n> [<repeat:n>]\n", argv[0]);
+    if (argc < 4) {
+        printf("Usage: %s <model_file: .synap> <input_mode: zero | random | value:n> <repeat:n> [--dump-out] [--dump-raw]\n", argv[0]);
         return 1;
     }
 
     const char* model_path = argv[1];
     const char* input_mode = argv[2];
-    int repeat = 1;
-    if (argc > 3) {
-        repeat = atoi(argv[3]);
-        if (repeat < 1) {
-            fprintf(stderr, "Invalid repeat count: %s\n", argv[3]);
+    int repeat = atoi(argv[3]);
+    if (repeat < 1) {
+        fprintf(stderr, "Invalid repeat count: %s\n", argv[3]);
+        return 1;
+    }
+
+    bool dump_out = false;
+    bool dump_raw = false;
+    for (int i = 4; i < argc; i++) {
+        if (strcmp(argv[i], "--dump-out") == 0) {
+            dump_out = true;
+        } else if (strcmp(argv[i], "--dump-raw") == 0) {
+            dump_raw = true;
+        } else {
+            fprintf(stderr, "Unknown option: %s\n", argv[i]);
             return 1;
         }
     }
@@ -121,6 +157,35 @@ int main(int argc, char** argv) {
         double infer_time = end.tv_nsec - start.tv_nsec;
         printf("Predict #%lu: %.2lf\n", i, infer_time / 1e6);
         infer_times[2] += infer_time;
+    }
+
+    if (dump_out) {
+        for (size_t i = 0; i < n_outputs; i++) {
+            char filename[32];
+            if (snprintf(filename, sizeof(filename), "output_float_%zu.dat", i) < 0) {
+                fprintf(stderr, "Error formatting output filename for output %lu\n", i);
+                continue;
+            }
+            printf("\nWriting denormalized output %zu to file: %s\n", i, filename);
+            if (!binary_file_write(filename, outputs[i].data.f32, outputs[i].size)) {
+                fprintf(stderr, "Failed to write output %lu to file: %s\n", i, filename);
+                continue;
+            }
+        }
+    }
+    if (dump_raw) {
+        for (size_t i = 0; i < n_outputs; i++) {
+            char filename[32];
+            if (snprintf(filename, sizeof(filename), "output_raw_%zu.dat", i) < 0) {
+                fprintf(stderr, "Error formatting raw output filename for output %lu\n", i);
+                continue;
+            }
+            printf("\nWriting raw output %zu to file: %s\n", i, filename);
+            if (!binary_file_write(filename, outputs[i].data.raw, outputs[i].size)) {
+                fprintf(stderr, "Failed to write output %lu to file: %s\n", i, filename);
+                continue;
+            }
+        }
     }
 
     printf("\nInference times (ms): load: %.2lf, init: %.2lf, predict: %.2lf\n",
