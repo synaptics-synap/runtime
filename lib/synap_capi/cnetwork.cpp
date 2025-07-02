@@ -68,7 +68,25 @@ bool network_predict(
 
     // assign inputs
     for (size_t i = 0; i < input_count; ++i) {
-        if (!net->inputs[inputs[i].index].assign(inputs[i].data, inputs[i].size)) {
+        const void* input_data;
+        switch(inputs[i].type) {
+            case INPUT_DTYPE_UINT8:
+                input_data = inputs[i].data.u8;
+                break;
+            case INPUT_DTYPE_INT16:
+                input_data = inputs[i].data.i16;
+                break;
+            case INPUT_DTYPE_FLOAT:
+                input_data = inputs[i].data.f32;
+                break;
+            case INPUT_DTYPE_RAW:
+                input_data = inputs[i].data.raw;
+                break;
+            default:
+                LOGE << "Unsupported input data type for input " << i;
+                return false;
+        }
+        if (!net->inputs[inputs[i].index].assign(input_data, inputs[i].size)) {
             LOGE << "Failed to assign data to input tensor " << inputs[i].index;
             return false;
         }

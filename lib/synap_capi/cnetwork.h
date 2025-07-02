@@ -13,13 +13,27 @@
 struct CNetwork;
 typedef struct CNetwork CNetwork;
 
+/// Network input data type
+/// @note No normalization or conversion is done for `INPUT_DTYPE_RAW`
+typedef enum {
+    INPUT_DTYPE_UINT8,
+    INPUT_DTYPE_INT16,
+    INPUT_DTYPE_FLOAT,
+    INPUT_DTYPE_RAW
+} CNetworkInputType;
+
 /// Represents an input to the network
-/// @note The data is considered as raw data, so no normalization or conversion is done
 /// @note Input data is owned and managed by the caller
 typedef struct {
-    const void* data;
+    union {
+        const float* f32;
+        const uint8_t* u8;
+        const int16_t* i16;
+        const void* raw;
+    } data;
     size_t size;
     size_t index;
+    CNetworkInputType type;
 } CNetworkInput;
 
 /// Represents an output from the network
@@ -51,7 +65,7 @@ bool network_load(CNetwork* network, const char* filename);
 
 
 /// Run inference on the network and get floating point outputs
-/// @note Inputs are considered as raw data so no normalization or conversion is done.
+/// @note No normalization or conversion is done for `INPUT_DTYPE_RAW` inputs
 /// @param network A CNetwork instance
 /// @param inputs Collection of inputs to the network
 /// @param input_count Number of inputs in the collection, must match the number of inputs in the network

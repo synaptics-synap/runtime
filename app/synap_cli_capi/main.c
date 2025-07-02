@@ -94,7 +94,7 @@ int main(int argc, char** argv) {
         }
         fill_input_uint8(input_data, input_size, input_mode);
         input_buffers[i] = input_data;
-        inputs[i].data = input_data;
+        inputs[i].data.u8 = input_data;
         inputs[i].size = input_size;
         inputs[i].index = i;
     }
