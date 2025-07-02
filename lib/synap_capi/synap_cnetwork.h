@@ -13,8 +13,8 @@
 struct CNetwork;
 typedef struct CNetwork CNetwork;
 
+
 /// Network input data type
-/// @note No normalization or conversion is done for `INPUT_DTYPE_RAW`
 typedef enum {
     INPUT_DTYPE_UINT8,
     INPUT_DTYPE_INT16,
@@ -22,26 +22,68 @@ typedef enum {
     INPUT_DTYPE_RAW
 } CNetworkInputType;
 
+
+/// Network output data type
+typedef enum {
+    OUTPUT_DTYPE_INVALID,
+    OUTPUT_DTYPE_BYTE,
+    OUTPUT_DTYPE_INT8,
+    OUTPUT_DTYPE_UINT8,
+    OUTPUT_DTYPE_INT16,
+    OUTPUT_DTYPE_UINT16,
+    OUTPUT_DTYPE_INT32,
+    OUTPUT_DTYPE_UINT32,
+    OUTPUT_DTYPE_FLOAT16,
+    OUTPUT_DTYPE_FLOAT32
+} CNetworkOutputType;
+
+
 /// Represents an input to the network
 /// @note Input data is owned and managed by the caller
 typedef struct {
+
+    /// Pointer to the input data
+    /// @note No normalization or conversion is done for `raw`
     union {
         const float* f32;
         const uint8_t* u8;
         const int16_t* i16;
         const void* raw;
     } data;
+
+    /// Size of the input data in bytes
+    /// @note For `INPUT_DTYPE_RAW`, the size is the number of bytes
+    /// @note For other types, the size is the number of elements of the type
     size_t size;
+
+    /// Index of the input tensor
     size_t index;
+
+    /// Type of the input data
     CNetworkInputType type;
+
 } CNetworkInput;
+
 
 /// Represents an output from the network
 /// @note Output data is owned by the network and must not be freed by the caller
 typedef struct {
-    const float* data;
+
+    /// Pointer to the output data
+    /// @note No de-normalization or conversion is done for `raw`
+    union {
+        const float* f32;
+        const void* raw;
+    } data;
+
+    /// Size of the output data in bytes
     size_t size;
+
+    /// Index of the output tensor
+    CNetworkOutputType type;
+
 } CNetworkOutput;
+
 
 #ifdef __cplusplus
 extern "C" {

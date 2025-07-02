@@ -94,7 +94,7 @@ int main(int argc, char** argv) {
 
     clock_gettime(CLOCK_MONOTONIC, &start);
     for (size_t i = 0; i < n_inputs; i++) {
-        size_t input_size = network_get_input_size(network, i);
+        size_t input_size = network_get_input_size(network, i) / sizeof(uint8_t);
         uint8_t* input_data = malloc(input_size);
         if (!input_data) {
             fprintf(stderr, "Failed to allocate input buffer\n");

@@ -97,8 +97,45 @@ bool network_predict(
 
     // assign outputs
     for (size_t i = 0; i < net->outputs.size(); ++i) {
-        outputs[i].data = net->outputs[i].as_float();
+        outputs[i].data.f32 = net->outputs[i].as_float();
+        outputs[i].data.raw = net->outputs[i].data();
         outputs[i].size = net->outputs[i].size();
+        switch(net->outputs[i].data_type()) {
+            case DataType::invalid:
+                outputs[i].type = OUTPUT_DTYPE_INVALID;
+                LOGW << "Invalid output data type for output " << i;
+                break;
+            case DataType::byte:
+                outputs[i].type = OUTPUT_DTYPE_BYTE;
+                break;
+            case DataType::int8:
+                outputs[i].type = OUTPUT_DTYPE_INT8;
+                break;
+            case DataType::uint8:
+                outputs[i].type = OUTPUT_DTYPE_UINT8;
+                break;
+            case DataType::int16:
+                outputs[i].type = OUTPUT_DTYPE_INT16;
+                break;
+            case DataType::uint16:
+                outputs[i].type = OUTPUT_DTYPE_UINT16;
+                break;
+            case DataType::int32:
+                outputs[i].type = OUTPUT_DTYPE_INT32;
+                break;
+            case DataType::uint32:
+                outputs[i].type = OUTPUT_DTYPE_UINT32;
+                break;
+            case DataType::float16:
+                outputs[i].type = OUTPUT_DTYPE_FLOAT16;
+                break;
+            case DataType::float32:
+                outputs[i].type = OUTPUT_DTYPE_FLOAT32;
+                break;
+            default:
+                LOGE << "Unsupported output data type for output " << i;
+                return false;
+        }
     }
 
     return true;
