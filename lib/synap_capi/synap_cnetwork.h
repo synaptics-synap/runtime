@@ -77,9 +77,10 @@ typedef struct {
     } data;
 
     /// Size of the output data in bytes
+    /// @note The size is always number of elements * sizeof(data type)
     size_t size;
 
-    /// Index of the output tensor
+    /// Type of the output data
     CNetworkOutputType type;
 
 } CNetworkOutput;
