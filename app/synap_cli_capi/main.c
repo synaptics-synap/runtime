@@ -29,12 +29,20 @@ void fill_input_uint8(uint8_t* buffer, size_t size, const char* mode) {
     }
 }
 
-void cleanup_buffers(uint8_t* buffers[], int count) {
-    for (int i = 0; i < count; i++) {
-        if (buffers[i]) {
-            free(buffers[i]);
+void cleanup(CNetwork* network,
+             uint8_t* input_buffers[], int n_inputs,
+             CNetworkInput* inputs,
+             CNetworkOutput* outputs) {
+    if (network) network_destroy(network);
+    if (input_buffers)
+        for (int i = 0; i < n_inputs; i++) {
+            if (input_buffers[i]) {
+                free(input_buffers[i]);
+            }
         }
-    }
+    free(input_buffers);
+    free(inputs);
+    free(outputs);
 }
 
 int main(int argc, char** argv) {
@@ -72,10 +80,7 @@ int main(int argc, char** argv) {
     CNetworkOutput* outputs = calloc(n_outputs, sizeof(CNetworkOutput));
     if (!input_buffers || !inputs || !outputs) {
         fprintf(stderr, "Allocation failed for input/output metadata\n");
-        free(input_buffers);
-        free(inputs);
-        free(outputs);
-        network_destroy(network);
+        cleanup(network, input_buffers, n_inputs, inputs, outputs);
         return 1;
     }
 
@@ -85,11 +90,7 @@ int main(int argc, char** argv) {
         uint8_t* input_data = malloc(input_size);
         if (!input_data) {
             fprintf(stderr, "Failed to allocate input buffer\n");
-            cleanup_buffers(input_buffers, i);
-            free(input_buffers);
-            free(inputs);
-            free(outputs);
-            network_destroy(network);
+            cleanup(network, input_buffers, i, inputs, outputs);
             return 1;
         }
         fill_input_uint8(input_data, input_size, input_mode);
@@ -104,11 +105,7 @@ int main(int argc, char** argv) {
     clock_gettime(CLOCK_MONOTONIC, &start);
     if (!network_predict(network, inputs, n_inputs, outputs, n_outputs)) {
         fprintf(stderr, "Inference failed\n");
-        cleanup_buffers(input_buffers, n_inputs);
-        free(input_buffers);
-        free(inputs);
-        free(outputs);
-        network_destroy(network);
+        cleanup(network, input_buffers, n_inputs, inputs, outputs);
         return 1;
     }
     clock_gettime(CLOCK_MONOTONIC, &end);
@@ -118,11 +115,7 @@ int main(int argc, char** argv) {
     printf("Inference times (ms): load: %lf, init: %lf, predict: %lf\n",
            infer_times[0] / 1e6, infer_times[1] / 1e6, infer_times[2] / 1e6);
 
-    cleanup_buffers(input_buffers, n_inputs);
-    free(input_buffers);
-    free(inputs);
-    free(outputs);
-    network_destroy(network);
+    cleanup(network, input_buffers, n_inputs, inputs, outputs);
 
     return 0;
 }
