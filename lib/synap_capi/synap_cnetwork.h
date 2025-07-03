@@ -130,23 +130,25 @@ size_t network_get_tensor_count(CNetwork* network, CNetworkTensorType type);
 
 
 /// Get the size of a specific input or output tensor in the network
-/// @param network 
-/// @param index 
+/// @param network A CNetwork instance
+/// @param index Index of the tensor in the collection
+/// @param type Type of the tensor (input or output)
 /// @return tensor size in bytes
 size_t network_get_tensor_size(CNetwork* network, size_t index, CNetworkTensorType type);
 
 
 /// Get pointer to denormalized tensor data for a specific input or output tensor
-/// @param network 
-/// @param index 
+/// @param network A CNetwork instance
+/// @param index Index of the tensor in the collection
+/// @param type Type of the tensor (input or output)
 /// @return float pointer to tensor data
 const float* network_get_tensor_data(CNetwork* network, size_t index, CNetworkTensorType type);
 
 
 /// Get pointer to raw input data for a specific input or output tensor
-/// @note No normalization or conversion is done for `raw` inputs
-/// @param network 
-/// @param index 
+/// @param network A CNetwork instance
+/// @param index Index of the tensor in the collection
+/// @param type Type of the tensor (input or output)
 /// @return void pointer to tensor data, must be manually cast to the appropriate type
 void* network_get_tensor_data_raw(CNetwork* network, size_t index, CNetworkTensorType type);
 
