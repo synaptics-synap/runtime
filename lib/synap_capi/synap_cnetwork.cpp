@@ -184,6 +184,41 @@ size_t network_get_tensor_size(CNetwork* network, size_t index, CNetworkTensorTy
         return network->impl->outputs[index].size();
 }
 
+size_t network_get_tensor_item_count(CNetwork* network, size_t index, CNetworkTensorType type) {
+    if (!_check_tensor_index_and_type(network, index, type)) return 0;
+
+    if (type == TENSOR_TYPE_INPUT)
+        return network->impl->inputs[index].item_count();
+    else
+        return network->impl->outputs[index].item_count();
+}
+
+CTensorDataType network_get_tensor_data_type(CNetwork* network, size_t index, CNetworkTensorType type) {
+    if (!_check_tensor_index_and_type(network, index, type)) return TENSOR_DTYPE_INVALID;
+
+    Tensor* tensor_ptr;
+    if (type == TENSOR_TYPE_INPUT)
+        tensor_ptr = &(network->impl->inputs[index]);
+    else
+        tensor_ptr = &(network->impl->outputs[index]);
+    
+    switch (tensor_ptr->data_type()) {
+        case DataType::invalid: return TENSOR_DTYPE_INVALID;
+        case DataType::byte:    return TENSOR_DTYPE_BYTE;
+        case DataType::int8:    return TENSOR_DTYPE_INT8;
+        case DataType::uint8:   return TENSOR_DTYPE_UINT8;
+        case DataType::int16:   return TENSOR_DTYPE_INT16;
+        case DataType::uint16:  return TENSOR_DTYPE_UINT16;
+        case DataType::int32:   return TENSOR_DTYPE_INT32;
+        case DataType::uint32:  return TENSOR_DTYPE_UINT32;
+        case DataType::float16: return TENSOR_DTYPE_FLOAT16;
+        case DataType::float32: return TENSOR_DTYPE_FLOAT32;
+        default:
+            LOGE << "Unknown tensor data type for tensor " << tensor_ptr->name();
+            return TENSOR_DTYPE_INVALID;
+    }
+}
+
 const float* network_get_tensor_data(CNetwork* network, size_t index, CNetworkTensorType type) {
     if (!_check_tensor_index_and_type(network, index, type)) return nullptr;
 

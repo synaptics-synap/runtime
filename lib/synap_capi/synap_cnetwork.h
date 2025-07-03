@@ -137,6 +137,22 @@ size_t network_get_tensor_count(CNetwork* network, CNetworkTensorType type);
 size_t network_get_tensor_size(CNetwork* network, size_t index, CNetworkTensorType type);
 
 
+/// Get the number of items in a specific input or output tensor
+/// @param network A CNetwork instance
+/// @param index Index of the tensor in the collection
+/// @param type Type of the tensor (input or output)
+/// @return Number of items in the tensor
+size_t network_get_tensor_item_count(CNetwork* network, size_t index, CNetworkTensorType type);
+
+
+/// Get the data type of a specific input or output tensor
+/// @param network A CNetwork instance
+/// @param index Index of the tensor in the collection
+/// @param type Type of the tensor (input or output)
+/// @return Data type of the tensor
+CTensorDataType network_get_tensor_data_type(CNetwork* network, size_t index, CNetworkTensorType type);
+
+
 /// Get pointer to denormalized tensor data for a specific input or output tensor
 /// @param network A CNetwork instance
 /// @param index Index of the tensor in the collection
