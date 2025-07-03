@@ -116,8 +116,8 @@ int main(int argc, char** argv) {
     clock_gettime(CLOCK_MONOTONIC, &end);
     infer_times[0] = end.tv_nsec - start.tv_nsec;
     printf("Loaded network: %s\n\n", model_path);
-    size_t n_inputs = network_get_input_count(network);
-    size_t n_outputs = network_get_output_count(network);
+    size_t n_inputs = network_get_tensor_count(network, TENSOR_TYPE_INPUT);
+    size_t n_outputs = network_get_tensor_count(network, TENSOR_TYPE_OUTPUT);
 
     uint8_t** input_buffers = calloc(n_inputs, sizeof(uint8_t*));
     CNetworkInput* inputs = calloc(n_inputs, sizeof(CNetworkInput));
@@ -130,7 +130,7 @@ int main(int argc, char** argv) {
 
     clock_gettime(CLOCK_MONOTONIC, &start);
     for (size_t i = 0; i < n_inputs; i++) {
-        size_t input_size = network_get_input_size(network, i) / sizeof(uint8_t);
+        size_t input_size = network_get_tensor_size(network, i, TENSOR_TYPE_INPUT) / sizeof(uint8_t);
         uint8_t* input_data = malloc(input_size);
         if (!input_data) {
             fprintf(stderr, "Failed to allocate input buffer\n");

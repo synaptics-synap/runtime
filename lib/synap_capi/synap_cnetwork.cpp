@@ -18,6 +18,33 @@ struct CNetwork {
 extern "C" {
 #endif
 
+bool _check_network(CNetwork* network) {
+    if (!network || !network->impl) {
+        LOGE << "Invalid network";
+        return false;
+    }
+    return true;
+}
+
+bool _check_tensor_index_and_type(CNetwork* network, size_t index, CNetworkTensorType type) {
+    if (!_check_network(network)) return false;
+    if (type == TENSOR_TYPE_INPUT) {
+        if (index >= network->impl->inputs.size()) {
+            LOGE << "Input index out of range: " << index << ", size: " << network->impl->inputs.size();
+            return false;
+        }
+    } else if (type == TENSOR_TYPE_OUTPUT) {
+        if (index >= network->impl->outputs.size()) {
+            LOGE << "Output index out of range: " << index << ", size: " << network->impl->outputs.size();
+            return false;
+        }
+    } else {
+        LOGE << "Invalid tensor type";
+        return false;
+    }
+    return true;
+}
+
 CNetwork* network_create() {
     Network* net = new Network();
     if (!net) {
@@ -36,10 +63,7 @@ void network_destroy(CNetwork* network) {
 }
 
 bool network_load(CNetwork* network, const char* filename) {
-    if (!network || !network->impl) {
-        LOGE << "Invalid network";
-        return false;
-    }
+    if (!_check_network(network)) return false;
     return network->impl->load_model(filename);
 }
 
@@ -48,10 +72,7 @@ bool network_predict(
     const CNetworkInput* inputs, size_t input_count,
     CNetworkOutput* outputs, size_t output_count
 ) {
-    if (!network || !network->impl) {
-        LOGE << "Invalid network";
-        return false;
-    }
+    if (!_check_network(network)) return false;
     Network* net = network->impl;
 
     // check inputs and outputs
@@ -68,25 +89,25 @@ bool network_predict(
 
     // assign inputs
     for (size_t i = 0; i < input_count; ++i) {
-        const void* input_data;
+        bool assigned = false;
         switch(inputs[i].type) {
             case INPUT_DTYPE_UINT8:
-                input_data = inputs[i].data.u8;
+                assigned = net->inputs[inputs[i].index].assign(inputs[i].data.u8, inputs[i].size);
                 break;
             case INPUT_DTYPE_INT16:
-                input_data = inputs[i].data.i16;
+                assigned = net->inputs[inputs[i].index].assign(inputs[i].data.i16, inputs[i].size);
                 break;
             case INPUT_DTYPE_FLOAT:
-                input_data = inputs[i].data.f32;
+                assigned = net->inputs[inputs[i].index].assign(inputs[i].data.f32, inputs[i].size);
                 break;
             case INPUT_DTYPE_RAW:
-                input_data = inputs[i].data.raw;
+                assigned = net->inputs[inputs[i].index].assign(inputs[i].data.raw, inputs[i].size);
                 break;
             default:
                 LOGE << "Unsupported input data type for input " << i;
                 return false;
         }
-        if (!net->inputs[inputs[i].index].assign(input_data, inputs[i].size)) {
+        if (!assigned) {
             LOGE << "Failed to assign data to input tensor " << inputs[i].index;
             return false;
         }
@@ -141,35 +162,44 @@ bool network_predict(
     return true;
 }
 
-size_t network_get_input_size(CNetwork* network, size_t index) {
-    if (!network || !network->impl) {
-        LOGE << "Invalid network";
+size_t network_get_tensor_count(CNetwork* network, CNetworkTensorType type) {
+    if (!_check_network(network))
+        return 0;
+    if (type == TENSOR_TYPE_INPUT)
+        return network->impl->inputs.size();
+    else if (type == TENSOR_TYPE_OUTPUT)
+        return network->impl->outputs.size();
+    else {
+        LOGE << "Invalid tensor type";
         return 0;
     }
-    Network* net = network->impl;
-
-    if (index >= net->inputs.size()) {
-        LOGE << "Input index out of range: " << index << ", size: " << net->inputs.size();
-        return 0;
-    }
-
-    return net->inputs[index].size();
 }
 
-size_t network_get_input_count(CNetwork* network) {
-    if (!network || !network->impl) {
-        LOGE << "Invalid network";
-        return 0;
-    }
-    return network->impl->inputs.size();
+size_t network_get_tensor_size(CNetwork* network, size_t index, CNetworkTensorType type) {
+    if (!_check_tensor_index_and_type(network, index, type)) return 0;
+
+    if (type == TENSOR_TYPE_INPUT)
+        return network->impl->inputs[index].size();
+    else
+        return network->impl->outputs[index].size();
 }
 
-size_t network_get_output_count(CNetwork* network) {
-    if (!network || !network->impl) {
-        LOGE << "Invalid network";
-        return 0;
-    }
-    return network->impl->outputs.size();
+const float* network_get_tensor_data(CNetwork* network, size_t index, CNetworkTensorType type) {
+    if (!_check_tensor_index_and_type(network, index, type)) return nullptr;
+
+    if (type == TENSOR_TYPE_INPUT)
+        return network->impl->inputs[index].as_float();
+    else
+        return network->impl->outputs[index].as_float();
+}
+
+void* network_get_tensor_data_raw(CNetwork* network, size_t index, CNetworkTensorType type) {
+    if (!_check_tensor_index_and_type(network, index, type)) return nullptr;
+
+    if (type == TENSOR_TYPE_INPUT)
+        return network->impl->inputs[index].data();
+    else
+        return network->impl->outputs[index].data();
 }
 
 #ifdef __cplusplus

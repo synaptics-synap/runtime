@@ -14,6 +14,13 @@ struct CNetwork;
 typedef struct CNetwork CNetwork;
 
 
+/// Network tensor type
+typedef enum {
+    TENSOR_TYPE_INPUT,
+    TENSOR_TYPE_OUTPUT,
+} CNetworkTensorType;
+
+
 /// Network input data type
 typedef enum {
     INPUT_DTYPE_UINT8,
@@ -122,23 +129,32 @@ bool network_predict(
 );
 
 
-/// Get the number of inputs in the network
+/// Get the number of tensors in the network inputs or outputs
 /// @param network A CNetwork instance
-/// @return Number of inputs in the network
-size_t network_get_input_count(CNetwork* network);
+/// @return Number of tensors in the collection
+size_t network_get_tensor_count(CNetwork* network, CNetworkTensorType type);
 
 
-/// Get the number of outputs in the network
-/// @param network A CNetwork instance
-/// @return Number of outputs in the network
-size_t network_get_output_count(CNetwork* network);
-
-
-/// Get the size of a specific input tensor in the network
+/// Get the size of a specific input or output tensor in the network
 /// @param network 
 /// @param index 
-/// @return input tensor size in bytes
-size_t network_get_input_size(CNetwork* network, size_t index);
+/// @return tensor size in bytes
+size_t network_get_tensor_size(CNetwork* network, size_t index, CNetworkTensorType type);
+
+
+/// Get pointer to denormalized tensor data for a specific input or output tensor
+/// @param network 
+/// @param index 
+/// @return float pointer to tensor data
+const float* network_get_tensor_data(CNetwork* network, size_t index, CNetworkTensorType type);
+
+
+/// Get pointer to raw input data for a specific input or output tensor
+/// @note No normalization or conversion is done for `raw` inputs
+/// @param network 
+/// @param index 
+/// @return void pointer to tensor data, must be manually cast to the appropriate type
+void* network_get_tensor_data_raw(CNetwork* network, size_t index, CNetworkTensorType type);
 
 #ifdef __cplusplus
 }
