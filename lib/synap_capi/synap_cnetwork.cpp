@@ -118,8 +118,8 @@ bool network_predict(
 
     // assign outputs
     for (size_t i = 0; i < net->outputs.size(); ++i) {
-        outputs[i].data.f32 = net->outputs[i].as_float();
-        outputs[i].data.raw = net->outputs[i].data();
+        outputs[i].data_float = net->outputs[i].as_float();
+        outputs[i].data = net->outputs[i].data();
         outputs[i].size = net->outputs[i].size();
         switch(net->outputs[i].data_type()) {
             case DataType::invalid:

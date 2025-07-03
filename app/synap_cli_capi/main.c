@@ -167,7 +167,7 @@ int main(int argc, char** argv) {
                 continue;
             }
             printf("\nWriting denormalized output %zu to file: %s\n", i, filename);
-            if (!binary_file_write(filename, outputs[i].data.f32, outputs[i].size)) {
+            if (!binary_file_write(filename, outputs[i].data_float, network_get_tensor_item_count(network, 0, TENSOR_TYPE_OUTPUT) * sizeof(float))) {
                 fprintf(stderr, "Failed to write output %lu to file: %s\n", i, filename);
                 continue;
             }
@@ -181,7 +181,7 @@ int main(int argc, char** argv) {
                 continue;
             }
             printf("\nWriting raw output %zu to file: %s\n", i, filename);
-            if (!binary_file_write(filename, outputs[i].data.raw, outputs[i].size)) {
+            if (!binary_file_write(filename, outputs[i].data, outputs[i].size)) {
                 fprintf(stderr, "Failed to write output %lu to file: %s\n", i, filename);
                 continue;
             }

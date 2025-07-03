@@ -76,12 +76,11 @@ typedef struct {
 /// @note Output data is owned by the network and must not be freed by the caller
 typedef struct {
 
-    /// Pointer to the output data
-    /// @note No de-normalization or conversion is done for `raw`
-    union {
-        const float* f32;
-        const void* raw;
-    } data;
+    /// Pointer to the denormalized output data
+    const float* data_float;
+
+    /// @note No de-normalization or conversion is done for `data_raw`
+    void* data;
 
     /// Size of the output data in bytes
     /// @note The size is always number of elements * sizeof(data type)
