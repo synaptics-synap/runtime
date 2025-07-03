@@ -123,35 +123,35 @@ bool network_predict(
         outputs[i].size = net->outputs[i].size();
         switch(net->outputs[i].data_type()) {
             case DataType::invalid:
-                outputs[i].type = OUTPUT_DTYPE_INVALID;
+                outputs[i].type = TENSOR_DTYPE_INVALID;
                 LOGW << "Invalid output data type for output " << i;
                 break;
             case DataType::byte:
-                outputs[i].type = OUTPUT_DTYPE_BYTE;
+                outputs[i].type = TENSOR_DTYPE_BYTE;
                 break;
             case DataType::int8:
-                outputs[i].type = OUTPUT_DTYPE_INT8;
+                outputs[i].type = TENSOR_DTYPE_INT8;
                 break;
             case DataType::uint8:
-                outputs[i].type = OUTPUT_DTYPE_UINT8;
+                outputs[i].type = TENSOR_DTYPE_UINT8;
                 break;
             case DataType::int16:
-                outputs[i].type = OUTPUT_DTYPE_INT16;
+                outputs[i].type = TENSOR_DTYPE_INT16;
                 break;
             case DataType::uint16:
-                outputs[i].type = OUTPUT_DTYPE_UINT16;
+                outputs[i].type = TENSOR_DTYPE_UINT16;
                 break;
             case DataType::int32:
-                outputs[i].type = OUTPUT_DTYPE_INT32;
+                outputs[i].type = TENSOR_DTYPE_INT32;
                 break;
             case DataType::uint32:
-                outputs[i].type = OUTPUT_DTYPE_UINT32;
+                outputs[i].type = TENSOR_DTYPE_UINT32;
                 break;
             case DataType::float16:
-                outputs[i].type = OUTPUT_DTYPE_FLOAT16;
+                outputs[i].type = TENSOR_DTYPE_FLOAT16;
                 break;
             case DataType::float32:
-                outputs[i].type = OUTPUT_DTYPE_FLOAT32;
+                outputs[i].type = TENSOR_DTYPE_FLOAT32;
                 break;
             default:
                 LOGE << "Unsupported output data type for output " << i;

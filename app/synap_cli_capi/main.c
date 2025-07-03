@@ -11,16 +11,16 @@
 
 
 /// generate dummy input (zero, constant, or random)
-void fill_input_uint8(uint8_t* buffer, size_t size, const char* mode) {
+void fill_input_uint8(uint8_t* buffer, size_t len, const char* mode) {
     if (strcmp(mode, "zero") == 0) {
-        memset(buffer, 0, size);
+        memset(buffer, 0, len);
     } else if (strncmp(mode, "value:", 6) == 0) {
         int val = atoi(mode + 6);
-        for (size_t i = 0; i < size; i++) {
+        for (size_t i = 0; i < len; i++) {
             buffer[i] = (uint8_t)val;
         }
     } else if (strcmp(mode, "random") == 0) {
-        for (size_t i = 0; i < size; i++) {
+        for (size_t i = 0; i < len; i++) {
             buffer[i] = rand() % 256;
         }
     } else {

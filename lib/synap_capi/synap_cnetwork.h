@@ -21,32 +21,32 @@ typedef enum {
 } CNetworkTensorType;
 
 
-/// Network input data type
+/// Input data type
 typedef enum {
     INPUT_DTYPE_UINT8,
     INPUT_DTYPE_INT16,
     INPUT_DTYPE_FLOAT,
     INPUT_DTYPE_RAW
-} CNetworkInputType;
+} CInputDataType;
 
 
-/// Network output data type
+/// Tensor data type
 typedef enum {
-    OUTPUT_DTYPE_INVALID,
-    OUTPUT_DTYPE_BYTE,
-    OUTPUT_DTYPE_INT8,
-    OUTPUT_DTYPE_UINT8,
-    OUTPUT_DTYPE_INT16,
-    OUTPUT_DTYPE_UINT16,
-    OUTPUT_DTYPE_INT32,
-    OUTPUT_DTYPE_UINT32,
-    OUTPUT_DTYPE_FLOAT16,
-    OUTPUT_DTYPE_FLOAT32
-} CNetworkOutputType;
+    TENSOR_DTYPE_INVALID,
+    TENSOR_DTYPE_BYTE,
+    TENSOR_DTYPE_INT8,
+    TENSOR_DTYPE_UINT8,
+    TENSOR_DTYPE_INT16,
+    TENSOR_DTYPE_UINT16,
+    TENSOR_DTYPE_INT32,
+    TENSOR_DTYPE_UINT32,
+    TENSOR_DTYPE_FLOAT16,
+    TENSOR_DTYPE_FLOAT32
+} CTensorDataType;
 
 
 /// Represents an input to the network
-/// @note Input data is owned and managed by the caller
+/// @note `data` is owned and managed by the caller
 typedef struct {
 
     /// Pointer to the input data, later converted to specified type
@@ -62,7 +62,7 @@ typedef struct {
     size_t index;
 
     /// Type of the input data
-    CNetworkInputType type;
+    CInputDataType type;
 
 } CNetworkInput;
 
@@ -74,7 +74,7 @@ typedef struct {
     /// Pointer to the denormalized output data
     const float* data_float;
 
-    /// @note No de-normalization or conversion is done for `data_raw`
+    /// @note No de-normalization or conversion is done for `data`
     void* data;
 
     /// Size of the output data in bytes
@@ -82,7 +82,7 @@ typedef struct {
     size_t size;
 
     /// Type of the output data
-    CNetworkOutputType type;
+    CTensorDataType type;
 
 } CNetworkOutput;
 
