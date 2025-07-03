@@ -49,14 +49,9 @@ typedef enum {
 /// @note Input data is owned and managed by the caller
 typedef struct {
 
-    /// Pointer to the input data
-    /// @note No normalization or conversion is done for `raw`
-    union {
-        const float* f32;
-        const uint8_t* u8;
-        const int16_t* i16;
-        const void* raw;
-    } data;
+    /// Pointer to the input data, later converted to specified type
+    /// @note No normalization or conversion is done for `INPUT_DTYPE_RAW`
+    const void* data;
 
     /// Size of the input data in bytes
     /// @note For `INPUT_DTYPE_RAW`, the size is the number of bytes

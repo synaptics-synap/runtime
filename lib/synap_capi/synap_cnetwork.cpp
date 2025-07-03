@@ -92,16 +92,16 @@ bool network_predict(
         bool assigned = false;
         switch(inputs[i].type) {
             case INPUT_DTYPE_UINT8:
-                assigned = net->inputs[inputs[i].index].assign(inputs[i].data.u8, inputs[i].size);
+                assigned = net->inputs[inputs[i].index].assign((const uint8_t*) inputs[i].data, inputs[i].size);
                 break;
             case INPUT_DTYPE_INT16:
-                assigned = net->inputs[inputs[i].index].assign(inputs[i].data.i16, inputs[i].size);
+                assigned = net->inputs[inputs[i].index].assign((const uint16_t*) inputs[i].data, inputs[i].size);
                 break;
             case INPUT_DTYPE_FLOAT:
-                assigned = net->inputs[inputs[i].index].assign(inputs[i].data.f32, inputs[i].size);
+                assigned = net->inputs[inputs[i].index].assign((const float*) inputs[i].data, inputs[i].size);
                 break;
             case INPUT_DTYPE_RAW:
-                assigned = net->inputs[inputs[i].index].assign(inputs[i].data.raw, inputs[i].size);
+                assigned = net->inputs[inputs[i].index].assign(inputs[i].data, inputs[i].size);
                 break;
             default:
                 LOGE << "Unsupported input data type for input " << i;
