@@ -130,18 +130,18 @@ int main(int argc, char** argv) {
 
     clock_gettime(CLOCK_MONOTONIC, &start);
     for (size_t i = 0; i < n_inputs; i++) {
-        size_t input_size = network_get_tensor_size(network, i, TENSOR_TYPE_INPUT);
-        uint8_t* input_data = malloc(input_size);
+        size_t n_elems = network_get_tensor_item_count(network, i, TENSOR_TYPE_INPUT);
+        uint8_t* input_data = malloc(sizeof(uint8_t) * n_elems);
         if (!input_data) {
             fprintf(stderr, "Failed to allocate input buffer\n");
             cleanup(network, input_buffers, i, inputs, outputs);
             return 1;
         }
-        fill_input_uint8(input_data, (int) input_size / sizeof(uint8_t), input_mode);
+        fill_input_uint8(input_data, n_elems, input_mode);
         input_buffers[i] = input_data;
         inputs[i].type = INPUT_DTYPE_UINT8;
         inputs[i].data = input_data;
-        inputs[i].size = input_size;
+        inputs[i].size = n_elems;
         inputs[i].index = i;
     }
     clock_gettime(CLOCK_MONOTONIC, &end);
