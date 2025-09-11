@@ -14,11 +14,9 @@ struct CNetwork {
     Network* impl;
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-bool _check_network(CNetwork* network) {
+// anonymous namespace for helpers
+namespace {
+    bool check_network(CNetwork* network) {
     if (!network || !network->impl) {
         LOGE << "Invalid network";
         return false;
@@ -26,8 +24,8 @@ bool _check_network(CNetwork* network) {
     return true;
 }
 
-bool _check_tensor_index_and_type(CNetwork* network, size_t index, CNetworkTensorType type) {
-    if (!_check_network(network)) return false;
+    bool check_tensor_index_and_type(CNetwork* network, size_t index, CNetworkTensorType type) {
+        if (!check_network(network)) return false;
     if (type == TENSOR_TYPE_INPUT) {
         if (index >= network->impl->inputs.size()) {
             LOGE << "Input index out of range: " << index << ", size: " << network->impl->inputs.size();
@@ -44,6 +42,12 @@ bool _check_tensor_index_and_type(CNetwork* network, size_t index, CNetworkTenso
     }
     return true;
 }
+}
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 CNetwork* network_create() {
     Network* net = new Network();
@@ -63,7 +67,7 @@ void network_destroy(CNetwork* network) {
 }
 
 bool network_load(CNetwork* network, const char* filename) {
-    if (!_check_network(network)) return false;
+    if (!check_network(network)) return false;
     return network->impl->load_model(filename);
 }
 
@@ -72,7 +76,7 @@ bool network_predict(
     const CNetworkInput* inputs, size_t input_count,
     CNetworkOutput* outputs, size_t output_count
 ) {
-    if (!_check_network(network)) return false;
+    if (!check_network(network)) return false;
     Network* net = network->impl;
 
     // check inputs and outputs
@@ -163,7 +167,7 @@ bool network_predict(
 }
 
 size_t network_get_tensor_count(CNetwork* network, CNetworkTensorType type) {
-    if (!_check_network(network))
+    if (!check_network(network))
         return 0;
     if (type == TENSOR_TYPE_INPUT)
         return network->impl->inputs.size();
@@ -176,7 +180,7 @@ size_t network_get_tensor_count(CNetwork* network, CNetworkTensorType type) {
 }
 
 size_t network_get_tensor_size(CNetwork* network, size_t index, CNetworkTensorType type) {
-    if (!_check_tensor_index_and_type(network, index, type)) return 0;
+    if (!check_tensor_index_and_type(network, index, type)) return 0;
 
     if (type == TENSOR_TYPE_INPUT)
         return network->impl->inputs[index].size();
@@ -185,7 +189,7 @@ size_t network_get_tensor_size(CNetwork* network, size_t index, CNetworkTensorTy
 }
 
 size_t network_get_tensor_item_count(CNetwork* network, size_t index, CNetworkTensorType type) {
-    if (!_check_tensor_index_and_type(network, index, type)) return 0;
+    if (!check_tensor_index_and_type(network, index, type)) return 0;
 
     if (type == TENSOR_TYPE_INPUT)
         return network->impl->inputs[index].item_count();
@@ -194,7 +198,7 @@ size_t network_get_tensor_item_count(CNetwork* network, size_t index, CNetworkTe
 }
 
 CTensorDataType network_get_tensor_data_type(CNetwork* network, size_t index, CNetworkTensorType type) {
-    if (!_check_tensor_index_and_type(network, index, type)) return TENSOR_DTYPE_INVALID;
+    if (!check_tensor_index_and_type(network, index, type)) return TENSOR_DTYPE_INVALID;
 
     Tensor* tensor_ptr;
     if (type == TENSOR_TYPE_INPUT)
@@ -220,7 +224,7 @@ CTensorDataType network_get_tensor_data_type(CNetwork* network, size_t index, CN
 }
 
 const float* network_get_tensor_data(CNetwork* network, size_t index, CNetworkTensorType type) {
-    if (!_check_tensor_index_and_type(network, index, type)) return nullptr;
+    if (!check_tensor_index_and_type(network, index, type)) return nullptr;
 
     if (type == TENSOR_TYPE_INPUT)
         return network->impl->inputs[index].as_float();
@@ -229,7 +233,7 @@ const float* network_get_tensor_data(CNetwork* network, size_t index, CNetworkTe
 }
 
 void* network_get_tensor_data_raw(CNetwork* network, size_t index, CNetworkTensorType type) {
-    if (!_check_tensor_index_and_type(network, index, type)) return nullptr;
+    if (!check_tensor_index_and_type(network, index, type)) return nullptr;
 
     if (type == TENSOR_TYPE_INPUT)
         return network->impl->inputs[index].data();
