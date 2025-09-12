@@ -17,31 +17,31 @@ struct CNetwork {
 // anonymous namespace for helpers
 namespace {
     bool check_network(CNetwork* network) {
-    if (!network || !network->impl) {
-        LOGE << "Invalid network";
-        return false;
+        if (!network || !network->impl) {
+            LOGE << "Invalid network";
+            return false;
+        }
+        return true;
     }
-    return true;
-}
 
     bool check_tensor_index_and_type(CNetwork* network, size_t index, CNetworkTensorType type) {
         if (!check_network(network)) return false;
-    if (type == TENSOR_TYPE_INPUT) {
-        if (index >= network->impl->inputs.size()) {
-            LOGE << "Input index out of range: " << index << ", size: " << network->impl->inputs.size();
+        if (type == TENSOR_TYPE_INPUT) {
+            if (index >= network->impl->inputs.size()) {
+                LOGE << "Input index out of range: " << index << ", size: " << network->impl->inputs.size();
+                return false;
+            }
+        } else if (type == TENSOR_TYPE_OUTPUT) {
+            if (index >= network->impl->outputs.size()) {
+                LOGE << "Output index out of range: " << index << ", size: " << network->impl->outputs.size();
+                return false;
+            }
+        } else {
+            LOGE << "Invalid tensor type";
             return false;
         }
-    } else if (type == TENSOR_TYPE_OUTPUT) {
-        if (index >= network->impl->outputs.size()) {
-            LOGE << "Output index out of range: " << index << ", size: " << network->impl->outputs.size();
-            return false;
-        }
-    } else {
-        LOGE << "Invalid tensor type";
-        return false;
+        return true;
     }
-    return true;
-}
 }
 
 
@@ -187,6 +187,28 @@ size_t network_get_tensor_size(CNetwork* network, size_t index, CNetworkTensorTy
     else
         return network->impl->outputs[index].size();
 }
+
+char* network_get_tensor_name(CNetwork* network, size_t index, CNetworkTensorType type) {
+    if (!check_tensor_index_and_type(network, index, type)) return nullptr;
+
+    const std::string* name_ptr;
+    if (type == TENSOR_TYPE_INPUT)
+        name_ptr = &(network->impl->inputs[index].name());
+    else if (type == TENSOR_TYPE_OUTPUT)
+        name_ptr = &(network->impl->outputs[index].name());
+    else {
+        LOGE << "Invalid tensor tensor type";
+        return nullptr;
+    }
+
+    // Allocate and copy
+    char* out = static_cast<char*>(std::malloc(name_ptr->size() + 1));
+    if (!out) return nullptr;
+    std::memcpy(out, name_ptr->c_str(), name_ptr->size() + 1);
+
+    return out;
+}
+
 
 size_t network_get_tensor_item_count(CNetwork* network, size_t index, CNetworkTensorType type) {
     if (!check_tensor_index_and_type(network, index, type)) return 0;

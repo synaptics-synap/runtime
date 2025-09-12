@@ -137,6 +137,15 @@ size_t network_get_tensor_count(CNetwork* network, CNetworkTensorType type);
 size_t network_get_tensor_size(CNetwork* network, size_t index, CNetworkTensorType type);
 
 
+/// Get the name of a specific input or output tensor in the network
+/// @note The returned string is heap-allocated and must be freed by the user
+/// @param network A CNetwork instance
+/// @param index Index of the tensor in the collection
+/// @param type Type of the tensor (input or output)
+/// @return tensor name
+char* network_get_tensor_name(CNetwork* network, size_t index, CNetworkTensorType type);
+
+
 /// Get the number of items in a specific input or output tensor
 /// @param network A CNetwork instance
 /// @param index Index of the tensor in the collection
