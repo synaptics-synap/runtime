@@ -44,11 +44,6 @@ namespace {
     }
 }
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 CNetwork* network_create() {
     Network* net = new Network();
     if (!net) {
@@ -262,7 +257,3 @@ void* network_get_tensor_data_raw(CNetwork* network, size_t index, CNetworkTenso
     else
         return network->impl->outputs[index].data();
 }
-
-#ifdef __cplusplus
-}
-#endif
