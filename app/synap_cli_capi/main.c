@@ -11,38 +11,48 @@
 
 
 /// generate dummy input (zero, constant, or random)
-void fill_input_uint8(uint8_t* buffer, size_t len, const char* mode) {
+static bool fill_input_float(float* buffer, size_t len, const char* mode) {
+    if (!buffer || !mode) {
+        fprintf(stderr, "fill_input_float: null buffer or invalid mode\n");
+        return false;
+    }
+
     if (strcmp(mode, "zero") == 0) {
-        memset(buffer, 0, len);
+        for (size_t i = 0; i < len; i++) buffer[i] = 0.0f;
     } else if (strncmp(mode, "value:", 6) == 0) {
-        int val = atoi(mode + 6);
-        for (size_t i = 0; i < len; i++) {
-            buffer[i] = (uint8_t)val;
+        char* endptr = NULL;
+        float val = strtof(mode + 6, &endptr);
+        if (*endptr != '\0') {
+            fprintf(stderr, "fill_input_float: invalid value in mode '%s'\n", mode);
+            return false;
         }
+        for (size_t i = 0; i < len; i++) buffer[i] = val;
     } else if (strcmp(mode, "random") == 0) {
         for (size_t i = 0; i < len; i++) {
-            buffer[i] = rand() % 256;
+           buffer[i] = (float)rand() / (float)RAND_MAX;  // [0,1)
         }
     } else {
-        fprintf(stderr, "Unknown input mode: %s\n", mode);
-        exit(1);
+        fprintf(stderr, "fill_input_float: unknown mode '%s'\n", mode);
+        return false;
     }
+    return true;
 }
 
-void cleanup(CNetwork* network,
-             uint8_t* input_buffers[], int n_inputs,
+static void cleanup(CNetwork* network,
+             float* input_buffers[], int n_inputs,
              CNetworkInput* inputs,
              CNetworkOutput* outputs) {
     if (network) network_destroy(network);
-    if (input_buffers)
+    if (input_buffers) {
         for (int i = 0; i < n_inputs; i++) {
             if (input_buffers[i]) {
                 free(input_buffers[i]);
             }
         }
     free(input_buffers);
-    free(inputs);
-    free(outputs);
+    }  
+    if (inputs)  free(inputs);
+    if (outputs) free(outputs);
 }
 
 bool binary_file_write(const char *file_name, const void *data, size_t size) {
@@ -119,7 +129,7 @@ int main(int argc, char** argv) {
     size_t n_inputs = network_get_tensor_count(network, TENSOR_TYPE_INPUT);
     size_t n_outputs = network_get_tensor_count(network, TENSOR_TYPE_OUTPUT);
 
-    uint8_t** input_buffers = calloc(n_inputs, sizeof(uint8_t*));
+    float** input_buffers = calloc(n_inputs, sizeof(float*));
     CNetworkInput* inputs = calloc(n_inputs, sizeof(CNetworkInput));
     CNetworkOutput* outputs = calloc(n_outputs, sizeof(CNetworkOutput));
     if (!input_buffers || !inputs || !outputs) {
@@ -131,15 +141,19 @@ int main(int argc, char** argv) {
     clock_gettime(CLOCK_MONOTONIC, &start);
     for (size_t i = 0; i < n_inputs; i++) {
         size_t n_elems = network_get_tensor_item_count(network, i, TENSOR_TYPE_INPUT);
-        uint8_t* input_data = malloc(sizeof(uint8_t) * n_elems);
+        float* input_data = malloc(sizeof(float) * n_elems);
         if (!input_data) {
             fprintf(stderr, "Failed to allocate input buffer\n");
             cleanup(network, input_buffers, i, inputs, outputs);
             return 1;
         }
-        fill_input_uint8(input_data, n_elems, input_mode);
+        if (!fill_input_float(input_data, n_elems, input_mode)) {
+            fprintf(stderr, "Failed to fill input values\n");
+            cleanup(network, input_buffers, i, inputs, outputs);
+            return 1;
+        }
         input_buffers[i] = input_data;
-        inputs[i].type = INPUT_DTYPE_UINT8;
+        inputs[i].type = INPUT_DTYPE_FLOAT;
         inputs[i].data = input_data;
         inputs[i].size = n_elems;
         inputs[i].index = i;
