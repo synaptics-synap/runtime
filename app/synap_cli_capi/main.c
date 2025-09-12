@@ -10,6 +10,31 @@
 #include <time.h>
 
 
+static void print_network_info(CNetwork* network, size_t n_inputs, size_t n_outputs) {
+    printf("Network inputs: %lu\n", n_inputs);
+    printf("Network outputs: %lu\n", n_outputs);
+    for (size_t i = 0; i < n_inputs; i++) {
+        char* tensor_name = network_get_tensor_name(network, i, TENSOR_TYPE_INPUT);
+        if (!tensor_name) {
+            fprintf(stderr, "Failed to get name of input %lu\n", i);
+            continue;
+        }
+        size_t tensor_size = network_get_tensor_size(network, i, TENSOR_TYPE_INPUT);
+        printf("Input buffer: %s size: %lu\n", tensor_name, tensor_size);
+        free(tensor_name);
+    }
+    for (size_t i = 0; i < n_outputs; i++) {
+        char* tensor_name = network_get_tensor_name(network, i, TENSOR_TYPE_OUTPUT);
+        if (!tensor_name) {
+            fprintf(stderr, "Failed to get name of output %lu\n", i);
+            continue;
+        }
+        size_t tensor_size = network_get_tensor_size(network, i, TENSOR_TYPE_OUTPUT);
+        printf("Output buffer: %s size: %lu\n", tensor_name, tensor_size);
+        free(tensor_name);
+    }
+}
+
 /// generate dummy input (zero, constant, or random)
 static bool fill_input_float(float* buffer, size_t len, const char* mode) {
     if (!buffer || !mode) {
@@ -49,7 +74,7 @@ static void cleanup(CNetwork* network,
                 free(input_buffers[i]);
             }
         }
-    free(input_buffers);
+        free(input_buffers);
     }  
     if (inputs)  free(inputs);
     if (outputs) free(outputs);
@@ -128,6 +153,8 @@ int main(int argc, char** argv) {
     printf("Loaded network: %s\n\n", model_path);
     size_t n_inputs = network_get_tensor_count(network, TENSOR_TYPE_INPUT);
     size_t n_outputs = network_get_tensor_count(network, TENSOR_TYPE_OUTPUT);
+    print_network_info(network, n_inputs, n_outputs);
+    printf("\n");
 
     float** input_buffers = calloc(n_inputs, sizeof(float*));
     CNetworkInput* inputs = calloc(n_inputs, sizeof(CNetworkInput));
