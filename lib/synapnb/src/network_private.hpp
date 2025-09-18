@@ -1,3 +1,6 @@
+// Copyright 2025 Synaptics Incorporated
+// SPDX-License-Identifier: Apache-2.0
+
 ///
 /// Network private implementation.
 /// This is kept in a private structure to keep Network class declaration clean

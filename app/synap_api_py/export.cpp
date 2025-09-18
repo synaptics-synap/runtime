@@ -1,3 +1,6 @@
+// Copyright 2025 Synaptics Incorporated
+// SPDX-License-Identifier: Apache-2.0
+
 #include <pybind11/pybind11.h>
 
 #include "export_preprocessor.cpp"

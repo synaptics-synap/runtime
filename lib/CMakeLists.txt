@@ -1,3 +1,6 @@
+# Copyright 2025 Synaptics Incorporated
+# SPDX-License-Identifier: Apache-2.0
+
 set(CMAKE_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_INCLUDEDIR}/synap)
 
 add_subdirectory(stb)

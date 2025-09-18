@@ -1,3 +1,6 @@
+# Copyright 2025 Synaptics Incorporated
+# SPDX-License-Identifier: Apache-2.0
+
 add_executable(synap_cli_info main.cpp)
 
 if(NOT CMAKE_CROSSCOMPILING)

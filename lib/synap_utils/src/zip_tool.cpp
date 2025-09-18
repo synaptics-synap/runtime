@@ -1,3 +1,6 @@
+// Copyright 2025 Synaptics Incorporated
+// SPDX-License-Identifier: Apache-2.0
+
 #include "synap/zip_tool.hpp"
 
 #include "synap/file_utils.hpp"

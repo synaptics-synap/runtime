@@ -1,3 +1,6 @@
+# Copyright 2025 Synaptics Incorporated
+# SPDX-License-Identifier: Apache-2.0
+
 set(app_name "synap_cli_tflitec")
 
 add_executable(${app_name} main.c)
