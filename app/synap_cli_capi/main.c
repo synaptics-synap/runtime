@@ -1,3 +1,6 @@
+// Copyright 2025 Synaptics Incorporated
+// SPDX-License-Identifier: Apache-2.0
+
 #define _POSIX_C_SOURCE 199309L
 
 #include "synap_cnetwork.h"

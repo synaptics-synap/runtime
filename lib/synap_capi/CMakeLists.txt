@@ -1,5 +1,5 @@
-# SPDX-License-Identifier: GPL-2.0
-# Copyright (C) 2025 Synaptics Incorporated
+# Copyright 2025 Synaptics Incorporated
+# SPDX-License-Identifier: Apache-2.0
 
 set(name synap_capi)
 
