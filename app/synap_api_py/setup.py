@@ -1,3 +1,6 @@
+# Copyright 2025 Synaptics Incorporated
+# SPDX-License-Identifier: Apache-2.0
+
 import os
 from pathlib import Path
 from setuptools import setup, find_packages, Extension

@@ -1,3 +1,6 @@
+// Copyright 2025 Synaptics Incorporated
+// SPDX-License-Identifier: Apache-2.0
+
 #include <memory>
 #include <vector>
 #include "synap/detector.hpp"

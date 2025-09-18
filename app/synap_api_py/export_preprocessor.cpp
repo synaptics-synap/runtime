@@ -1,3 +1,6 @@
+// Copyright 2025 Synaptics Incorporated
+// SPDX-License-Identifier: Apache-2.0
+
 #include <string>
 #include "synap/input_data.hpp"
 #include "synap/preprocessor.hpp"
