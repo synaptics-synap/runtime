@@ -1,3 +1,6 @@
+# Copyright 2025 Synaptics Incorporated
+# SPDX-License-Identifier: Apache-2.0
+
 set(TARGET_NAME synap)
 set(PYBIND11_DIR ${CMAKE_SOURCE_DIR}/extern/pybind11)
 set(EXPORT_SRC

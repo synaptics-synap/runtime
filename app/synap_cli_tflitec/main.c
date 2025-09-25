@@ -1,3 +1,8 @@
+/*
+ * Copyright 2025 Synaptics Incorporated
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include "tensorflow/lite/c/c_api.h"
 #include "tensorflow/lite/c/c_api_experimental.h"
 #include "tensorflow/lite/delegates/gpu/delegate.h"

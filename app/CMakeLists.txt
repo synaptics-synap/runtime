@@ -1,3 +1,6 @@
+# Copyright 2025 Synaptics Incorporated
+# SPDX-License-Identifier: Apache-2.0
+
 if(ENABLE_EBGRUNTIME)
 #    add_subdirectory(synap_cli_nb)
 endif()

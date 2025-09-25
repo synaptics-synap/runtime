@@ -1,3 +1,6 @@
+// Copyright 2025 Synaptics Incorporated
+// SPDX-License-Identifier: Apache-2.0
+
 ///
 /// Buffer private implementation.
 /// This is kept in a private structure to keep Buffer class declaration clean
