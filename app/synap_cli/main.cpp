@@ -163,7 +163,7 @@ int main(int argc, char** argv)
     int num_predict = stoi(args.get("-r", "<n> Repeat count", "1"));
     int num_create = stoi(args.get("--rr", "<n> Repeat network creation count", "1"));
     int fps = stoi(args.get("--fps", "<n> Inferences per second", "0"));
-#ifdef SYNAP_EBG_ENABLE
+#if defined(SYNAP_EBG_ENABLE) || defined(SYNAP_TORQ_ENABLE)
     string secure_mode_str = args.get("--secure", "<s> Buffer security: " + enum_tags(secure_mode_values));
     string allocator_type_str = args.get("--allocator", "<s> Allocator: " + enum_tags(allocator_type_values));
 #endif
@@ -190,7 +190,7 @@ int main(int argc, char** argv)
 
     AllocatorType allocator_type;
     SecureMode secure_mode{};
-#ifdef SYNAP_EBG_ENABLE
+#if defined(SYNAP_EBG_ENABLE) || defined(SYNAP_TORQ_ENABLE)
     if (!get_enum(allocator_type_str, allocator_type_values, allocator_type)) {
         cerr << "Unknown allocator: " << allocator_type_str << endl;
         return 1;

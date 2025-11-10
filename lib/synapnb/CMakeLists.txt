@@ -54,6 +54,13 @@ if(ENABLE_TFLITERUNTIME)
     target_compile_definitions(synapnb PRIVATE SYNAP_TFLITE_ENABLE=1)
 endif()
 
+if(ENABLE_TORQRUNTIME)
+    target_sources(synapnb PRIVATE
+       src/predictor_torq.cpp
+    )
+    target_link_libraries(synapnb PUBLIC torq-runtime)
+    target_compile_definitions(synapnb PRIVATE SYNAP_TORQ_ENABLE=1)
+endif()
 
 target_link_libraries(synapnb
     PUBLIC synap_utils

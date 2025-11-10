@@ -22,6 +22,9 @@
 #ifdef SYNAP_TFLITE_ENABLE
 #include "predictor_tflite.hpp"
 #endif
+#ifdef SYNAP_TORQ_ENABLE
+#include "predictor_torq.hpp"
+#endif
 #include "predictor_bundle.hpp"
 
 
@@ -99,6 +102,11 @@ static unique_ptr<Predictor> make_predictor(const string& delegate)
 #ifdef SYNAP_TFLITE_ENABLE
     if (delegate == "tflite") {
         return make_unique<PredictorTFLite>();
+    }
+#endif
+#ifdef SYNAP_TORQ_ENABLE
+    if (delegate == "torq") {
+        return make_unique<PredictorTORQ>();
     }
 #endif
 
